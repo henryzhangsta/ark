@@ -1,0 +1,67 @@
+# Name of the Map String to start the server
+map: TheIsland
+
+# Port that the server will listen on. The RAW port will always be 1 higher than this
+clientPort: 7777
+
+# Port the Steam Server API will listen on
+queryPort: 27015
+
+# Exposes and external service of type LoadBalancer. This will be the external endpoint that
+# players connect to
+service:
+  type: LoadBalancer
+  # loadBalancerIP:
+
+# Run the server on a specific node
+nodeAffinity:
+  matchExpressions:
+  - key: kubernetes.io/hostname
+    operator: In
+    values:
+    - worker-1
+
+# Should clustering be enabled? This requires ReadWriteMany volumes
+cluster:
+  enabled: true
+  name: cluster
+
+  # Share the server, config, and data folders
+  shareVolumes: true
+
+# Volumes for game data
+volumes:
+  server:
+    create: true
+
+    # Can also be ReadWriteOnce, but will result in data duplication
+    accessMode: ReadOnlyMany
+    capacity: 30Gi
+    options:
+      local:
+        path: "/opt/ark-data/server"
+  config:
+    create: true
+
+    # Can also be ReadWriteOnce, but will result in data duplication
+    accessMode: ReadOnlyMany
+    capacity: 100Mi
+    options:
+      local:
+        path: "/opt/ark-data/config"
+  cluster:
+    create: true
+
+    accessMode: ReadWriteMany
+    capacity: 100Mi
+    options:
+      local:
+        path: "/opt/ark-data/cluster"
+  save:
+    create: true
+
+    accessMode: ReadWriteOnce
+    capacity: 5Gi
+    options:
+      local:
+        path: "/opt/ark-data/save/TheIsland"

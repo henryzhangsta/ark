@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "ark.fullname" . }}
+spec:
+  serviceName: {{ template "ark.name" . }}
+  replicas: 1
+  updateStrategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {{ template "ark.fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "ark.fullname" . }}
+        app.kubernetes.io/name: {{ include "ark.name" . }}
+    spec:
+      initContainers:
+      - name: "{{ .Chart.Name }}-update"
+        image: {{ default "henryzhangsta/ark" .Values.image }}
+        imagePullPolicy: {{ default "IfNotPresent" .Values.imagePullPolicy }}
+        volumeMounts:
+        - name: server
+          mountPath: /ark/server
+        - name: config
+          mountPath: /ark/config
+        command:
+        - './update.sh'
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ default "henryzhangsta/ark" .Values.image }}
+        imagePullPolicy: {{ default "IfNotPresent" .Values.imagePullPolicy }}
+        ports:
+        - containerPort: {{ .Values.clientPort }}
+          protocol: UDP
+        - containerPort: {{ add .Values.clientPort 1 }}
+          protocol: UDP
+        - containerPort: {{ .Values.queryPort }}
+          protocol: UDP
+        env:
+        - name: MAP
+          value: {{ .Values.map }}
+        - name: CLIENT_PORT
+          value: {{ .Values.clientPort }}
+        - name: RAW_PORT
+          value: {{ add .Values.clientPort 1 }}
+        - name: QUERY_PORT
+          value: {{ .Values.queryPort }}
+        volumeMounts:
+        - name: server
+          mountPath: /ark/server
+        {{- if .Values.cluster.enabled }}
+        - name: cluster
+          mountPath: /ark/cluster
+        {{- end }}
+        - name: config
+          mountPath: /ark/config
+          readOnly: true
+        - name: save
+          mountPath: /ark/save
+        resources:
+          requests:
+            memory: 4Gi
+            cpu: "1.5"
+      volumes:
+      - name: server
+        persistentVolumeClaim:
+          claimName: "{{ include "ark.fullname" . }}-server"
+      {{- if .Values.cluster.enabled }}
+      - name: cluster
+        persistentVolumeClaim:
+          claimName: "{{ include "ark.fullname" . }}-cluster"
+      {{- end }}
+      - name: config
+        persistentVolumeClaim:
+          claimName: "{{ include "ark.fullname" . }}-config"
+      terminationGracePeriodSeconds: 120
+  volumeClaimTemplates:
+  - metadata:
+      name: save
+    spec:
+      {{- $volume := index .Values.volumes "save" }}
+      storageClassName: {{ $volume.storageClassName }}
+      volumeName: "{{ include "ark.fullname" . }}-save"
+      volumeMode: Filesystem
+      accessModes:
+      - {{ $volume.accessMode }}
+      resources:
+        requests:
+          storage: {{ $volume.capacity }}

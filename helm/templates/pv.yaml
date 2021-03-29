@@ -1,0 +1,53 @@
+{{- $root := . -}}
+
+{{- range $name := (ternary (list "server" "config" "cluster") (list "server" "config") .Values.cluster.enabled) -}}
+
+{{- $volume := index $root.Values.volumes $name -}}
+{{- if $volume.create }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ include "ark.volumeName" (dict "Values" $root.Values "Chart" $root.Chart "Release" $root.Release "name" $name) }}
+spec:
+  capacity:
+    storage: {{ $volume.capacity }}
+  volumeMode: Filesystem
+  accessModes:
+  - {{ $volume.accessMode }}
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: {{ $volume.storageClassName }}
+{{ toYaml $volume.options | indent 2 }}
+{{- if not (empty $root.Values.nodeAffinity.matchExpressions) }}
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+{{ toYaml $root.Values.nodeAffinity.matchExpressions | indent 8 }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+# Saves are always per instance
+{{- $volume := index $root.Values.volumes "save" }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: "{{ include "ark.fullname" $root }}-save"
+spec:
+  capacity:
+    storage: {{ $volume.capacity }}
+  volumeMode: Filesystem
+  accessModes:
+  - {{ $volume.accessMode }}
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: {{ $volume.storageClassName }}
+{{ toYaml $volume.options | indent 2 }}
+{{- if not (empty $root.Values.nodeAffinity.matchExpressions) }}
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+{{ toYaml $root.Values.nodeAffinity.matchExpressions | indent 8 }}
+{{- end }}

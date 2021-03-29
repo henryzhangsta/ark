@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ark.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "ark.name" . }}
+spec:
+  ports:
+    - name: game
+      protocol: UDP
+      port: {{ .Values.clientPort }}
+      targetPort: {{ .Values.clientPort }}
+    - name: raw
+      protocol: UDP
+      port: {{ add .Values.clientPort 1 }}
+      targetPort: {{ add .Values.clientPort 1 }}
+    - name: query
+      protocol: UDP
+      port: {{ .Values.queryPort }}
+      targetPort: {{ .Values.queryPort }}
+  selector:
+    app: {{ template "ark.fullname" . }}
+  type: {{ .Values.service.type }}
+  loadBalancerIP: {{ .Values.service.loadBalancerIP }}
