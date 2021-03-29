@@ -21,7 +21,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 
 {{- define "ark.volumeName" -}}
 {{- if .Values.cluster.enabled -}}
-"{{ include "ark.name" . }}-{{ .Values.cluster.name }}-{{ .name }}"
+"{{ include "ark.name" . }}-{{ .Values.cluster.id }}-{{ .name }}"
 {{- else -}}
 "{{ include "ark.fullName" . }}-{{ .name }}"
 {{- end -}}

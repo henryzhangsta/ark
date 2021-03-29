@@ -32,21 +32,27 @@ spec:
         image: {{ default "henryzhangsta/ark" .Values.image }}
         imagePullPolicy: {{ default "IfNotPresent" .Values.imagePullPolicy }}
         ports:
-        - containerPort: {{ .Values.clientPort }}
+        - containerPort: 7777
           protocol: UDP
-        - containerPort: {{ add .Values.clientPort 1 }}
+        - containerPort: 7778
           protocol: UDP
-        - containerPort: {{ .Values.queryPort }}
+        - containerPort: 27015
           protocol: UDP
         env:
         - name: MAP
-          value: {{ .Values.map }}
-        - name: CLIENT_PORT
-          value: {{ .Values.clientPort }}
-        - name: RAW_PORT
-          value: {{ add .Values.clientPort 1 }}
-        - name: QUERY_PORT
-          value: {{ .Values.queryPort }}
+          value: {{ .Values.instance.map }}
+        - name: MAX_PLAYERS
+          value: {{ .Values.instance.maxPlayers }}
+        - name: SESSION_NAME
+          value: {{ .Values.instance.name }}
+        - name: SERVER_PASSWORD
+          value: {{ .Values.instance.password }}
+        - name: SERVER_ADMIN_PASSWORD
+          value: {{ .Values.instance.adminPassword }}
+        {{- if .Values.cluster.enabled }}
+        - name: CLUSTER_ID
+          value: {{ .Values.cluster.id }}
+        {{- end }}
         volumeMounts:
         - name: server
           mountPath: /ark/server

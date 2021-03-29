@@ -1,11 +1,18 @@
-# Name of the Map String to start the server
-map: TheIsland
+# Server name
+instance:
+  name: Ark
+  maxPlayers: 10
+  password: ""
+  adminPassword: ""
 
-# Port that the server will listen on. The RAW port will always be 1 higher than this
-clientPort: 7777
+  # Name of the Map String to start the server
+  map: TheIsland
 
-# Port the Steam Server API will listen on
-queryPort: 27015
+  # Port that the server will listen on. The RAW port will always be 1 higher than this
+  clientPort: 7777
+
+  # Port the Steam Server API will listen on
+  queryPort: 27015
 
 # Exposes and external service of type LoadBalancer. This will be the external endpoint that
 # players connect to
@@ -24,7 +31,7 @@ nodeAffinity:
 # Should clustering be enabled? This requires ReadWriteMany volumes
 cluster:
   enabled: true
-  name: cluster
+  id: cluster
 
   # Share the server, config, and data folders
   shareVolumes: true

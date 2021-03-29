@@ -31,7 +31,23 @@ if [ ! -d "$SAVE_ROOT/Logs" ]; then
     ln -s /ark/save/Logs "$SAVE_ROOT/Logs"
 fi
 
+SESSION_PARAMS="?SessionName=$SESSION_NAME?RCONEnabled=true"
+
+if [ -z "$SERVER_PASSWORD" ]; then
+    SESSION_PARAMS+="?ServerPassword=$SERVER_PASSWORD"
+fi
+
+if [ -z "$SERVER_ADMIN_PASSWORD" ]; then
+    SESSION_PARAMS+="?ServerAdminPassword=$SERVER_ADMIN_PASSWORD"
+fi
+
+if [ -z "$CLUSTER_ID" ]; then
+    CLUSTER_OPTS=("-ClusterDirOverride=/ark/cluster" "-clusterid=$CLUSTER_ID")
+else
+    CLUSTER_OPTS=()
+fi
+
 cd server/ShooterGame/Binaries/Linux \
     && ./ShooterGameServer \
-    "$MAP?listen?SessionName=Arkkkk?ServerPassword=pandemic?ServerAdminPassword=gamergirlbathwater?Port=$CLIENT_PORT?QueryPort=$QUERY_PORT?MaxPlayers=10?RCONEnabled=true?ShowFloatingDamageText=true" \
-    -NoBattlEye -server -servergamelog -automanagedmods -structurememopts -noantispeedhack -ClusterDirOverride=/ark/cluster -clusterid=cluster1
+    "$MAP?listen?Port=7777?QueryPort=27015?MaxPlayers=$MAX_PLAYERS$SESSION_PARAMS" \
+    -server -servergamelog -automanagedmods -structurememopts "${CLUSTER_OPTS[@]}"

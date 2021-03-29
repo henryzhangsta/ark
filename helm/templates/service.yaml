@@ -8,16 +8,16 @@ spec:
   ports:
     - name: game
       protocol: UDP
-      port: {{ .Values.clientPort }}
-      targetPort: {{ .Values.clientPort }}
+      port: {{ .Values.instance.clientPort }}
+      targetPort: 7777
     - name: raw
       protocol: UDP
-      port: {{ add .Values.clientPort 1 }}
-      targetPort: {{ add .Values.clientPort 1 }}
+      port: {{ add .Values.instance.clientPort 1 }}
+      targetPort: 7778
     - name: query
       protocol: UDP
-      port: {{ .Values.queryPort }}
-      targetPort: {{ .Values.queryPort }}
+      port: {{ .Values.instance.queryPort }}
+      targetPort: 27015
   selector:
     app: {{ template "ark.fullname" . }}
   type: {{ .Values.service.type }}
