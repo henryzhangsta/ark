@@ -87,7 +87,8 @@ spec:
       - name: config
         persistentVolumeClaim:
           claimName: "{{ include "ark.fullname" . }}-config"
-      terminationGracePeriodSeconds: 120
+      # Give up to 3 minutes for shutdown
+      terminationGracePeriodSeconds: 180
   volumeClaimTemplates:
   - metadata:
       name: save

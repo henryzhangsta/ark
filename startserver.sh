@@ -47,8 +47,7 @@ else
     CLUSTER_OPTS=()
 fi
 
-readarray -t EXTRA_SERVER_OPTS <(echo -e "$EXTRA_SERVER_OPTS")
 cd server/ShooterGame/Binaries/Linux \
     && ./ShooterGameServer \
     "$MAP?listen?Port=$CLIENT_PORT?QueryPort=$QUERY_PORT?MaxPlayers=$MAX_PLAYERS$SESSION_PARAMS" \
-    -server -servergamelog -automanagedmods -structurememopts "${CLUSTER_OPTS[@]}" "${EXTRA_SERVER_OPTS[@]}"
+    -server -servergamelog -automanagedmods -structurememopts "${CLUSTER_OPTS[@]}" $EXTRA_SERVER_OPTS
