@@ -33,21 +33,22 @@ fi
 
 SESSION_PARAMS="?SessionName=$SESSION_NAME?RCONEnabled=true"
 
-if [ -z "$SERVER_PASSWORD" ]; then
+if [ -n "$SERVER_PASSWORD" ]; then
     SESSION_PARAMS+="?ServerPassword=$SERVER_PASSWORD"
 fi
 
-if [ -z "$SERVER_ADMIN_PASSWORD" ]; then
+if [ -n "$SERVER_ADMIN_PASSWORD" ]; then
     SESSION_PARAMS+="?ServerAdminPassword=$SERVER_ADMIN_PASSWORD"
 fi
 
-if [ -z "$CLUSTER_ID" ]; then
+if [ -n "$CLUSTER_ID" ]; then
     CLUSTER_OPTS=("-ClusterDirOverride=/ark/cluster" "-clusterid=$CLUSTER_ID")
 else
     CLUSTER_OPTS=()
 fi
 
+readarray -t EXTRA_SERVER_OPTS <(echo -e "$EXTRA_SERVER_OPTS")
 cd server/ShooterGame/Binaries/Linux \
     && ./ShooterGameServer \
-    "$MAP?listen?Port=7777?QueryPort=27015?MaxPlayers=$MAX_PLAYERS$SESSION_PARAMS" \
-    -server -servergamelog -automanagedmods -structurememopts "${CLUSTER_OPTS[@]}"
+    "$MAP?listen?Port=$CLIENT_PORT?QueryPort=$QUERY_PORT?MaxPlayers=$MAX_PLAYERS$SESSION_PARAMS" \
+    -server -servergamelog -automanagedmods -structurememopts "${CLUSTER_OPTS[@]}" "${EXTRA_SERVER_OPTS[@]}"

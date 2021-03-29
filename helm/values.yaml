@@ -5,6 +5,8 @@ instance:
   password: ""
   adminPassword: ""
 
+  extraServerOpts: ""
+
   # Name of the Map String to start the server
   map: TheIsland
 
@@ -14,10 +16,19 @@ instance:
   # Port the Steam Server API will listen on
   queryPort: 27015
 
+deployment:
+  # Can't be changed for now
+  type: StatefulSet
+
+  updateStrategy: RollingUpdate
+
 # Exposes and external service of type LoadBalancer. This will be the external endpoint that
 # players connect to
 service:
   type: LoadBalancer
+
+  # Additional annotations to add (for example to setup ALB/MetalLB)
+  annotations:
   # loadBalancerIP:
 
 # Run the server on a specific node
@@ -41,8 +52,9 @@ volumes:
   server:
     create: true
 
+    storageClassName: local-storage
     # Can also be ReadWriteOnce, but will result in data duplication
-    accessMode: ReadOnlyMany
+    accessMode: ReadWriteMany
     capacity: 30Gi
     options:
       local:
@@ -50,8 +62,9 @@ volumes:
   config:
     create: true
 
+    storageClassName: local-storage
     # Can also be ReadWriteOnce, but will result in data duplication
-    accessMode: ReadOnlyMany
+    accessMode: ReadWriteMany
     capacity: 100Mi
     options:
       local:
@@ -59,14 +72,14 @@ volumes:
   cluster:
     create: true
 
+    storageClassName: local-storage
     accessMode: ReadWriteMany
     capacity: 100Mi
     options:
       local:
         path: "/opt/ark-data/cluster"
   save:
-    create: true
-
+    storageClassName: local-storage
     accessMode: ReadWriteOnce
     capacity: 5Gi
     options:

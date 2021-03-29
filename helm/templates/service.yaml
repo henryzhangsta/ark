@@ -4,20 +4,19 @@ metadata:
   name: {{ include "ark.fullname" . }}
   labels:
     app.kubernetes.io/name: {{ include "ark.name" . }}
+  annotations:
+{{ toYaml .Values.service.annotations | indent 4 }}
 spec:
   ports:
     - name: game
       protocol: UDP
       port: {{ .Values.instance.clientPort }}
-      targetPort: 7777
     - name: raw
       protocol: UDP
       port: {{ add .Values.instance.clientPort 1 }}
-      targetPort: 7778
     - name: query
       protocol: UDP
       port: {{ .Values.instance.queryPort }}
-      targetPort: 27015
   selector:
     app: {{ template "ark.fullname" . }}
   type: {{ .Values.service.type }}

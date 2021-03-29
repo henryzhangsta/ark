@@ -6,7 +6,7 @@ spec:
   serviceName: {{ template "ark.name" . }}
   replicas: 1
   updateStrategy:
-    type: Recreate
+    type: {{ .Values.deployment.updateStrategy }}
   selector:
     matchLabels:
       app: {{ template "ark.fullname" . }}
@@ -32,37 +32,43 @@ spec:
         image: {{ default "henryzhangsta/ark" .Values.image }}
         imagePullPolicy: {{ default "IfNotPresent" .Values.imagePullPolicy }}
         ports:
-        - containerPort: 7777
+        - containerPort: {{ .Values.instance.clientPort }}
           protocol: UDP
-        - containerPort: 7778
+        - containerPort: {{ add .Values.instance.clientPort 1 }}
           protocol: UDP
-        - containerPort: 27015
+        - containerPort: {{ .Values.instance.queryPort }}
           protocol: UDP
         env:
         - name: MAP
-          value: {{ .Values.instance.map }}
+          value: "{{ .Values.instance.map }}"
+        - name: CLIENT_PORT
+          value: "{{ .Values.instance.clientPort }}"
+        - name: QUERY_PORT
+          value: "{{ .Values.instance.queryPort }}"
         - name: MAX_PLAYERS
-          value: {{ .Values.instance.maxPlayers }}
+          value: "{{ .Values.instance.maxPlayers }}"
         - name: SESSION_NAME
-          value: {{ .Values.instance.name }}
+          value: "{{ .Values.instance.name }}"
         - name: SERVER_PASSWORD
-          value: {{ .Values.instance.password }}
+          value: "{{ .Values.instance.password }}"
         - name: SERVER_ADMIN_PASSWORD
-          value: {{ .Values.instance.adminPassword }}
+          value: "{{ .Values.instance.adminPassword }}"
+        - name: EXTRA_SERVER_OPTS
+          value: "{{ .Values.instance.extraServerOpts }}"
         {{- if .Values.cluster.enabled }}
         - name: CLUSTER_ID
-          value: {{ .Values.cluster.id }}
+          value: "{{ .Values.cluster.id }}"
         {{- end }}
         volumeMounts:
         - name: server
           mountPath: /ark/server
+        - name: config
+          mountPath: /ark/config
+          readOnly: true
         {{- if .Values.cluster.enabled }}
         - name: cluster
           mountPath: /ark/cluster
         {{- end }}
-        - name: config
-          mountPath: /ark/config
-          readOnly: true
         - name: save
           mountPath: /ark/save
         resources:
