@@ -87,9 +87,9 @@ spec:
           preStop:
             exec:
               command:
-              - /bin/kill
-              - -SIGINT
-              - "1"
+              - /usr/bin/pkill
+              - "-2"
+              - "ShooterGame"
       volumes:
       - name: server
         persistentVolumeClaim:
