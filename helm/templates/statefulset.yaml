@@ -38,6 +38,8 @@ spec:
           protocol: UDP
         - containerPort: {{ .Values.instance.queryPort }}
           protocol: UDP
+        - containerPort: 27020
+          protocol: TCP
         env:
         - name: MAP
           value: "{{ .Values.instance.map }}"
@@ -50,9 +52,15 @@ spec:
         - name: SESSION_NAME
           value: "{{ .Values.instance.name }}"
         - name: SERVER_PASSWORD
-          value: "{{ .Values.instance.password }}"
+          valueFrom:
+            secretKeyRef:
+              name: "{{ include "ark.fullname" . }}-passwords"
+              key: password
         - name: SERVER_ADMIN_PASSWORD
-          value: "{{ .Values.instance.adminPassword }}"
+          valueFrom:
+            secretKeyRef:
+              name: "{{ include "ark.fullname" . }}-passwords"
+              key: adminPassword
         - name: EXTRA_SERVER_OPTS
           value: "{{ .Values.instance.extraServerOpts }}"
         {{- if .Values.cluster.enabled }}
@@ -75,6 +83,13 @@ spec:
           requests:
             memory: 4Gi
             cpu: "1.5"
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/kill
+              - -SIGINT
+              - "1"
       volumes:
       - name: server
         persistentVolumeClaim:
