@@ -51,6 +51,7 @@ cluster:
 volumes:
   server:
     create: true
+    shared: false
 
     storageClassName: local-storage
     # Can also be ReadWriteOnce, but will result in data duplication
@@ -60,7 +61,8 @@ volumes:
       local:
         path: "/opt/ark-data/server"
   config:
-    create: true
+    create: false
+    shared: true
 
     storageClassName: local-storage
     # Can also be ReadWriteOnce, but will result in data duplication
@@ -70,15 +72,18 @@ volumes:
       local:
         path: "/opt/ark-data/config"
   cluster:
-    create: true
+    create: false
+    shared: true
 
     storageClassName: local-storage
     accessMode: ReadWriteMany
-    capacity: 100Mi
+    capacity: 200Mi
     options:
       local:
         path: "/opt/ark-data/cluster"
   save:
+    shared: false
+
     storageClassName: local-storage
     accessMode: ReadWriteOnce
     capacity: 5Gi

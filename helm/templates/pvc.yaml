@@ -6,10 +6,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: "{{ include "ark.fullname" $root }}-{{ $name }}"
+  name: {{ include "ark.volumeName" (dict "Values" $root.Values "Chart" $root.Chart "Release" $root.Release "name" $name "shared" $volume.shared) }}
 spec:
   storageClassName: {{ $volume.storageClassName }}
-  volumeName: {{ include "ark.volumeName" (dict "Values" $root.Values "Chart" $root.Chart "Release" $root.Release "name" $name) }}
+{{- if $volume.create }}
+  volumeName: {{ include "ark.volumeName" (dict "Values" $root.Values "Chart" $root.Chart "Release" $root.Release "name" $name "shared" $volume.shared) }}
+{{- end }}
   volumeMode: Filesystem
   accessModes:
   - {{ $volume.accessMode }}

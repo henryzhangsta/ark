@@ -26,7 +26,7 @@ spec:
         - name: config
           mountPath: /ark/config
         command:
-        - './update.sh'
+        - "./update.sh"
       containers:
       - name: {{ .Chart.Name }}
         image: {{ default "henryzhangsta/ark" .Values.image }}
@@ -67,6 +67,8 @@ spec:
         - name: CLUSTER_ID
           value: "{{ .Values.cluster.id }}"
         {{- end }}
+        command:
+        - "./startserver.sh"
         volumeMounts:
         - name: server
           mountPath: /ark/server
@@ -93,15 +95,15 @@ spec:
       volumes:
       - name: server
         persistentVolumeClaim:
-          claimName: "{{ include "ark.fullname" . }}-server"
+          claimName: {{ include "ark.volumeName" (dict "Values" .Values "Chart" .Chart "Release" .Release "name" "server" "shared" .Values.volumes.server.shared) }}
       {{- if .Values.cluster.enabled }}
       - name: cluster
         persistentVolumeClaim:
-          claimName: "{{ include "ark.fullname" . }}-cluster"
+          claimName: {{ include "ark.volumeName" (dict "Values" .Values "Chart" .Chart "Release" .Release "name" "cluster" "shared" .Values.volumes.cluster.shared) }}
       {{- end }}
       - name: config
         persistentVolumeClaim:
-          claimName: "{{ include "ark.fullname" . }}-config"
+          claimName: {{ include "ark.volumeName" (dict "Values" .Values "Chart" .Chart "Release" .Release "name" "config" "shared" .Values.volumes.config.shared) }}
       # Give up to 3 minutes for shutdown
       terminationGracePeriodSeconds: 180
   volumeClaimTemplates:
