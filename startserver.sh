@@ -12,6 +12,10 @@ if [ ! -d "$DEFAULT_STEAMAPPS" ]; then
     ln -s /ark/server/steamapps "$DEFAULT_STEAMAPPS"
 fi
 
+if [ ! -d "$SAVE_ROOT" ]; then
+    mkdir -p "$SAVE_ROOT"
+fi
+
 if [ ! -d "$SAVE_ROOT/Config" ]; then
     ln -s /ark/config "$SAVE_ROOT/Config"
 fi
