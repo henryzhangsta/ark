@@ -47,6 +47,8 @@ cluster:
   # Share the server, config, and data folders
   shareVolumes: true
 
+fsGroup: 1001
+
 # Volumes for game data
 volumes:
   server:

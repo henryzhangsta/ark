@@ -16,6 +16,8 @@ spec:
         app: {{ template "ark.fullname" . }}
         app.kubernetes.io/name: {{ include "ark.name" . }}
     spec:
+      securityContext:
+        fsGroup: {{ .Values.fsGroup }}
       initContainers:
       - name: "{{ .Chart.Name }}-update"
         image: {{ default "henryzhangsta/ark" .Values.image }}
@@ -83,7 +85,7 @@ spec:
           mountPath: /ark/save
         resources:
           requests:
-            memory: 4Gi
+            memory: 3Gi
             cpu: "1.5"
         lifecycle:
           preStop:
