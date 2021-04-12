@@ -17,6 +17,8 @@ instance:
   queryPort: 27015
 
 deployment:
+  enabled: true
+
   # Can't be changed for now
   type: StatefulSet
 
@@ -25,6 +27,8 @@ deployment:
 # Exposes and external service of type LoadBalancer. This will be the external endpoint that
 # players connect to
 service:
+  enabled: true
+
   type: LoadBalancer
 
   # Additional annotations to add (for example to setup ALB/MetalLB)
@@ -51,44 +55,53 @@ fsGroup: 1001
 
 # Volumes for game data
 volumes:
-  server:
-    create: true
-    shared: false
-
-    storageClassName: local-storage
-    # Can also be ReadWriteOnce, but will result in data duplication
-    accessMode: ReadWriteMany
-    capacity: 30Gi
-    options:
-      local:
-        path: "/opt/ark-data/server"
   config:
-    create: false
+    createVolume: true
+    createClaim: true
     shared: true
 
     storageClassName: local-storage
     # Can also be ReadWriteOnce, but will result in data duplication
     accessMode: ReadWriteMany
     capacity: 100Mi
+    persistentVolumeReclaimPolicy: Retain
     options:
       local:
         path: "/opt/ark-data/config"
   cluster:
-    create: false
+    createVolume: true
+    createClaim: true
     shared: true
 
     storageClassName: local-storage
     accessMode: ReadWriteMany
     capacity: 200Mi
+    persistentVolumeReclaimPolicy: Retain
     options:
       local:
         path: "/opt/ark-data/cluster"
+  server:
+    createVolume: true
+    createClaim: true
+    shared: false
+
+    storageClassName: local-storage
+    # Can also be ReadWriteOnce, but will result in data duplication
+    accessMode: ReadWriteMany
+    capacity: 30Gi
+    persistentVolumeReclaimPolicy: Retain
+    options:
+      local:
+        path: "/opt/ark-data/server"
   save:
+    createVolume: true
+    createClaim: true
     shared: false
 
     storageClassName: local-storage
     accessMode: ReadWriteOnce
     capacity: 5Gi
+    persistentVolumeReclaimPolicy: Retain
     options:
       local:
         path: "/opt/ark-data/save/TheIsland"

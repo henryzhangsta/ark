@@ -2,7 +2,7 @@
 
 {{- range $name := (ternary (list "server" "config" "cluster") (list "server" "config") .Values.cluster.enabled) }}
 {{- $volume := index $root.Values.volumes $name }}
-{{- if $volume.create }}
+{{- if $volume.createClaim }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -10,7 +10,6 @@ metadata:
   name: {{ include "ark.volumeName" (dict "Values" $root.Values "Chart" $root.Chart "Release" $root.Release "name" $name "shared" $volume.shared) }}
 spec:
   storageClassName: {{ $volume.storageClassName }}
-  volumeName: {{ include "ark.volumeName" (dict "Values" $root.Values "Chart" $root.Chart "Release" $root.Release "name" $name "shared" $volume.shared) }}
   volumeMode: Filesystem
   accessModes:
   - {{ $volume.accessMode }}
