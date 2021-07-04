@@ -3,6 +3,8 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ template "ark.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "ark.name" . }}
 spec:
   serviceName: {{ template "ark.name" . }}
   replicas: 1
